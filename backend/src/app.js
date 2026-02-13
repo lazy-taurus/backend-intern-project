@@ -25,6 +25,10 @@ if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
 
+const authRoutes = require('./routes/auth.routes');
+
+app.use('/api/v1/auth', authRoutes);
+
 // Health check
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'success', message: 'Server is healthy' });
