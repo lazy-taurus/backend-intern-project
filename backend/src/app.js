@@ -26,8 +26,10 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 const authRoutes = require('./routes/auth.routes');
+const taskRoutes = require('./routes/task.routes');
 
 app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/tasks', taskRoutes);
 
 // Health check
 app.get('/health', (req, res) => {
