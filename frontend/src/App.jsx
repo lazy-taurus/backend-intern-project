@@ -2,9 +2,8 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { useContext } from 'react';
 import { AuthContext, AuthProvider } from './context/AuthContext';
 
-// We will create these components in the next phase
-const Login = () => <div>Login Page (Coming Next)</div>;
-const Dashboard = () => <div>Dashboard (Coming Next)</div>;
+import Login from './pages/Login';
+import Dashboard from './pages/Dashboard';
 
 const ProtectedRoute = ({ children }) => {
   const { user } = useContext(AuthContext);
