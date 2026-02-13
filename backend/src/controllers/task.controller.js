@@ -73,10 +73,8 @@ exports.updateTask = asyncHandler(async (req, res) => {
     return res.status(403).json({ message: 'Not authorized to update this task' });
   }
 
-  task = await Task.findByIdAndUpdate(req.params.id, validatedData, {
-    new: true,
-    runValidators: true,
-  }).lean();
+  Object.assign(task, validatedData);
+  await task.save();
 
   res.status(200).json(task);
 });

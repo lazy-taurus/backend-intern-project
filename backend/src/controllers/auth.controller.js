@@ -11,7 +11,10 @@ exports.register = asyncHandler(async (req, res) => {
     return res.status(409).json({ message: 'User already exists' });
   }
 
-  const user = await User.create(validatedData);
+  const user = await User.create({
+    ...validatedData,
+    role: 'user',
+  });
 
   const token = generateToken(user._id);
 

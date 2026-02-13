@@ -9,7 +9,16 @@ const swaggerDocs = require('./docs/swagger');
 const app = express();
 
 // Security Middlewares
-app.use(helmet()); 
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "cdnjs.cloudflare.com"],
+      styleSrc: ["'self'", "'unsafe-inline'", "cdnjs.cloudflare.com", "fonts.googleapis.com"],
+      imgSrc: ["'self'", "data:", "validator.swagger.io"]
+    },
+  },
+})); 
 app.use(cors());
 
 // Rate limiting

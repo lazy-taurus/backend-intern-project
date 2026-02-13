@@ -143,6 +143,39 @@ const swaggerOptions = {
         },
       },
       '/tasks/{id}': {
+        get: {
+          summary: 'Get a task by ID',
+          tags: ['Tasks'],
+          security: [{ bearerAuth: [] }],
+          parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }],
+          responses: {
+            200: { description: 'Task data' },
+            404: { description: 'Task not found' }
+          }
+        },
+        put: {
+          summary: 'Update a task',
+          tags: ['Tasks'],
+          security: [{ bearerAuth: [] }],
+          parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }],
+          requestBody: {
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    title: { type: 'string' },
+                    description: { type: 'string' },
+                    status: { type: 'string', enum: ['pending', 'in-progress', 'completed'] }
+                  }
+                }
+              }
+            }
+          },
+          responses: {
+            200: { description: 'Task updated successfully' }
+          }
+        },
         delete: {
           summary: 'Delete a task',
           tags: ['Tasks'],
