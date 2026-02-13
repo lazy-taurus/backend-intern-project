@@ -30,5 +30,19 @@ app.get('/health', (req, res) => {
   res.status(200).json({ status: 'success', message: 'Server is healthy' });
 });
 
+app.use((err, req, res, next) => {
+  if (err.name === 'ZodError') {
+    return res.status(400).json({
+      message: 'Validation Error',
+      errors: err.errors.map(e => ({ field: e.path.join('.'), message: e.message }))
+    });
+  }
+
+  const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
+  res.status(statusCode).json({
+    message: err.message,
+    stack: process.env.NODE_ENV === 'production' ? null : err.stack,
+  });
+});
 
 module.exports = app;
