@@ -62,69 +62,122 @@ const Dashboard = () => {
   };
 
   return (
-    <div style={{ maxWidth: '600px', margin: '20px auto', fontFamily: 'sans-serif' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h2>Welcome, {user?.name} ({user?.role})</h2>
-        <button onClick={logout} style={{ padding: '5px 10px', cursor: 'pointer' }}>Logout</button>
-      </div>
-
-      {message.text && (
-        <div style={{ padding: '10px', marginBottom: '15px', backgroundColor: message.type === 'error' ? '#ffcccc' : '#ccffcc', color: message.type === 'error' ? 'red' : 'green' }}>
-          {message.text}
+    <div className="min-h-screen bg-slate-50 font-sans">
+      {/* Top Navbar */}
+      <nav className="bg-white border-b border-gray-200 px-8 py-4 flex justify-between items-center sticky top-0 z-50 shadow-sm">
+        <div className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold">T</div>
+            <span className="text-xl font-bold text-gray-800 tracking-tight">TaskFlow</span>
         </div>
-      )}
+        <div className="flex items-center gap-6">
+            <span className="text-sm text-gray-500 hidden md:block">
+                Welcome, <span className="text-gray-900 font-medium">{user?.name}</span>
+                <span className="text-xs bg-gray-100 px-2 py-1 rounded ml-2 font-mono">{user?.role}</span>
+            </span>
+            <button onClick={logout} className="text-sm font-medium text-red-500 hover:text-red-600 transition">Logout</button>
+        </div>
+      </nav>
 
-      <form onSubmit={handleCreateTask} style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
-        <input 
-          type="text" placeholder="Task Title" required
-          value={newTask.title} onChange={(e) => setNewTask({ ...newTask, title: e.target.value })} 
-        />
-        <input 
-          type="text" placeholder="Description (Optional)" 
-          value={newTask.description} onChange={(e) => setNewTask({ ...newTask, description: e.target.value })} 
-        />
-        <button type="submit" style={{ padding: '5px 10px', cursor: 'pointer' }}>Add Task</button>
-      </form>
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto px-6 py-10">
+        
+        {/* Header & Alerts */}
+        <div className="mb-8">
+            <h1 className="text-3xl font-bold text-gray-900">Your Workspace</h1>
+            <p className="text-gray-500 mt-1">Manage, track, and organize your daily objectives.</p>
+        </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-        {tasks.length === 0 ? <p>No tasks found. Create one above!</p> : tasks.map(task => (
-          <div key={task._id} style={{ border: '1px solid #ccc', padding: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            
-            {/* If this task is being edited, show an edit form */}
-            {editingTask?._id === task._id ? (
-              <form onSubmit={handleUpdateTask} style={{ display: 'flex', gap: '10px', width: '100%' }}>
+        {message.text && (
+            <div className={`p-4 rounded-lg mb-6 text-sm flex items-center gap-2 border ${message.type === 'error' ? 'bg-red-50 text-red-600 border-red-100' : 'bg-green-50 text-green-600 border-green-100'}`}>
+                {message.type === 'error' ? '⚠️' : '✅'} {message.text}
+            </div>
+        )}
+
+        {/* Create Task Form */}
+        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-10">
+            <form onSubmit={handleCreateTask} className="flex flex-col md:flex-row gap-4">
                 <input 
-                  type="text" value={editingTask.title} required
-                  onChange={(e) => setEditingTask({ ...editingTask, title: e.target.value })} 
+                    type="text" placeholder="What needs to be done?" required
+                    className="flex-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition"
+                    value={newTask.title} onChange={(e) => setNewTask({ ...newTask, title: e.target.value })} 
                 />
-                <select 
-                  value={editingTask.status} 
-                  onChange={(e) => setEditingTask({ ...editingTask, status: e.target.value })}
-                >
-                  <option value="pending">Pending</option>
-                  <option value="in-progress">In-Progress</option>
-                  <option value="completed">Completed</option>
-                </select>
-                <button type="submit" style={{ cursor: 'pointer', color: 'green' }}>Save</button>
-                <button type="button" onClick={() => setEditingTask(null)} style={{ cursor: 'pointer' }}>Cancel</button>
-              </form>
-            ) : (
-              <>
-                {/* Standard Task Display */}
-                <div>
-                  <h4 style={{ margin: '0 0 5px 0' }}>{task.title}</h4>
-                  <p style={{ margin: 0, fontSize: '14px', color: '#555' }}>{task.description}</p>
-                  <small>Status: <strong>{task.status}</strong></small>
+                <input 
+                    type="text" placeholder="Description (Optional)" 
+                    className="flex-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition"
+                    value={newTask.description} onChange={(e) => setNewTask({ ...newTask, description: e.target.value })} 
+                />
+                <button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg transition-all shadow-md hover:shadow-blue-500/30 whitespace-nowrap">
+                    Add Task
+                </button>
+            </form>
+        </div>
+
+        {/* Tasks Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {tasks.length === 0 ? (
+                <div className="col-span-full text-center py-20 text-gray-500 bg-white rounded-2xl border border-gray-100 border-dashed">
+                    No tasks found. Get started by creating one above!
                 </div>
-                <div>
-                  <button onClick={() => setEditingTask(task)} style={{ cursor: 'pointer', marginRight: '10px' }}>Edit</button>
-                  <button onClick={() => handleDeleteTask(task._id)} style={{ color: 'red', cursor: 'pointer' }}>Delete</button>
+            ) : tasks.map(task => (
+                <div key={task._id} className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col justify-between hover:shadow-md transition">
+                    
+                    {/* EDIT MODE */}
+                    {editingTask?._id === task._id ? (
+                        <form onSubmit={handleUpdateTask} className="flex flex-col gap-3 h-full">
+                            <input 
+                                type="text" value={editingTask.title} required
+                                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 outline-none text-sm"
+                                onChange={(e) => setEditingTask({ ...editingTask, title: e.target.value })} 
+                            />
+                            <textarea 
+                                value={editingTask.description || ''} 
+                                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 outline-none text-sm resize-none"
+                                onChange={(e) => setEditingTask({ ...editingTask, description: e.target.value })} 
+                            />
+                            <select 
+                                value={editingTask.status} 
+                                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 outline-none text-sm bg-white"
+                                onChange={(e) => setEditingTask({ ...editingTask, status: e.target.value })}
+                            >
+                                <option value="pending">Pending</option>
+                                <option value="in-progress">In-Progress</option>
+                                <option value="completed">Completed</option>
+                            </select>
+                            <div className="flex gap-2 mt-auto pt-4">
+                                <button type="submit" className="flex-1 bg-green-500 text-white py-2 rounded-lg text-sm font-medium hover:bg-green-600 transition">Save</button>
+                                <button type="button" onClick={() => setEditingTask(null)} className="flex-1 bg-gray-100 text-gray-700 py-2 rounded-lg text-sm font-medium hover:bg-gray-200 transition">Cancel</button>
+                            </div>
+                        </form>
+                    ) : (
+                        /* VIEW MODE */
+                        <>
+                            <div>
+                                <div className="flex justify-between items-start mb-2">
+                                    <h4 className="font-bold text-gray-900 text-lg leading-tight pr-2">{task.title}</h4>
+                                    <span className={`px-2 py-1 rounded-md text-xs font-bold tracking-wide border ${
+                                        task.status === 'completed' ? 'bg-green-50 text-green-700 border-green-200' :
+                                        task.status === 'in-progress' ? 'bg-yellow-50 text-yellow-700 border-yellow-200' :
+                                        'bg-gray-50 text-gray-600 border-gray-200'
+                                    }`}>
+                                        {task.status.toUpperCase()}
+                                    </span>
+                                </div>
+                                <p className="text-gray-500 text-sm mb-6 line-clamp-3">{task.description || 'No description provided.'}</p>
+                            </div>
+                            <div className="flex gap-3 mt-auto pt-4 border-t border-gray-50">
+                                <button onClick={() => setEditingTask(task)} className="flex-1 bg-gray-50 text-blue-600 py-2 rounded-lg text-sm font-medium hover:bg-blue-100 transition border border-gray-100">
+                                    Edit
+                                </button>
+                                <button onClick={() => handleDeleteTask(task._id)} className="flex-1 bg-gray-50 text-red-600 py-2 rounded-lg text-sm font-medium hover:bg-red-50 transition border border-gray-100">
+                                    Delete
+                                </button>
+                            </div>
+                        </>
+                    )}
                 </div>
-              </>
-            )}
-          </div>
-        ))}
-      </div>
+            ))}
+        </div>
+      </main>
     </div>
   );
 };
