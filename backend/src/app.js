@@ -3,6 +3,8 @@ const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
+const swaggerUi = require('swagger-ui-express');
+const swaggerDocs = require('./docs/swagger');
 
 const app = express();
 
@@ -27,6 +29,8 @@ if (process.env.NODE_ENV === 'development') {
 
 const authRoutes = require('./routes/auth.routes');
 const taskRoutes = require('./routes/task.routes');
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/tasks', taskRoutes);
