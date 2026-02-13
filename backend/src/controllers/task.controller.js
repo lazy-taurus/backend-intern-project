@@ -1,6 +1,7 @@
 const Task = require('../models/Task');
 const asyncHandler = require('../utils/asyncHandler');
 const { createTaskSchema, updateTaskSchema } = require('../validations/task.validation');
+const { client } = require('../config/redis');
 
 exports.createTask = asyncHandler(async (req, res) => {
   const validatedData = createTaskSchema.parse(req.body);
@@ -17,6 +18,18 @@ exports.getTasks = asyncHandler(async (req, res) => {
   // Pagination & Filtering
   const page = parseInt(req.query.page, 10) || 1;
   const limit = parseInt(req.query.limit, 10) || 10;
+  const status = req.query.status || 'all';
+  const cacheKey = `tasks:${req.user._id}:page:${page}:limit:${limit}:status:${status}`;
+
+  try {
+    const cachedTasks = await client.get(cacheKey);
+    if (cachedTasks) {
+      return res.status(200).json(JSON.parse(cachedTasks));
+    }
+  } catch (err) {
+    console.error("Redis get error:", err);
+  }
+
   const skip = (page - 1) * limit;
 
   const query = {};
@@ -38,13 +51,21 @@ exports.getTasks = asyncHandler(async (req, res) => {
 
   const total = await Task.countDocuments(query);
 
-  res.status(200).json({
+  const responseData = {
     count: tasks.length,
     total,
     page,
     totalPages: Math.ceil(total / limit),
     data: tasks,
-  });
+  };
+
+  try {
+    await client.setEx(cacheKey, 300, JSON.stringify(responseData));
+  } catch (err) {
+    console.error("Redis set error:", err);
+  }
+
+  res.status(200).json(responseData);
 });
 
 exports.getTask = asyncHandler(async (req, res) => {

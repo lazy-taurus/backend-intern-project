@@ -5,6 +5,7 @@ const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocs = require('./docs/swagger');
+const logger = require('./utils/logger');
 
 const app = express();
 
@@ -59,6 +60,8 @@ app.use((err, req, res, next) => {
       errors: err.errors.map(e => ({ field: e.path.join('.'), message: e.message }))
     });
   }
+  
+  logger.error(`${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
 
   const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
   res.status(statusCode).json({
